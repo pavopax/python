@@ -337,6 +337,8 @@ y.dead.astype('bool')
 
 ### Nulls
 
+tags: missing na count missing
+
 ```python
 df.isnull().sum().sum()
 
