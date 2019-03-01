@@ -308,7 +308,7 @@ record = {
     'rows' : X.shape[0],
     'cols' : X.shape[1],
     'model': str(pipe.steps[-1]),
-    'full_pipe' : str(pipe.steps).replace("\n", "")
+    'full_pipe' : re.sub("\s+", " ", str(pipe.steps)))
 }
 
 
