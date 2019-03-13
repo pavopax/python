@@ -87,6 +87,24 @@ Xt = vt.fit_transform(X)
 X.columns[vt.get_support()]
 ```
 
+Function to filter top K most variant columns:
+
+```python
+from sklearn.feature_selection import VarianceThreshold
+
+def top_variance_filter(df, k=100):
+    """Return df with top most variant columns"""
+    columns = df.columns.values
+    # get variances
+    vt = VarianceThreshold(0)
+    vt.fit(df)
+    variances = vt.variances_
+    # https://stackoverflow.com/a/6910672/3217870
+    index_top_variances = np.argpartition(variances, -k)[-k:]
+    df = df.iloc[:, index_top_variances]
+    return(df)
+```
+
 Best practice: apply a preprocessing pipeline separately from a modeling pipeline. 
 
 Rationale
