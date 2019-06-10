@@ -250,8 +250,12 @@ def response_to_0_1(row):
         return(1)
     else:
         return(0)
-
-outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
+	
+	
+# old:
+# outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
+# new:
+outcomes['resp_0_1'] = outcomes.apply(binarize_y, axis=1)
 ```
 
 
