@@ -2,7 +2,7 @@
 
 # Python snippets for modeling
 
-Jump to: [Modeling](#modeling) / [Preproc](#preproc) / [Data](#data) / [Utils](#utils)
+Jump to: [Modeling](#modeling) / [Preproc](#preproc) / [Data](#data) / [Utils](#utils) / [Plots](#plots)
 
 # Modeling
 
@@ -226,12 +226,12 @@ source: https://stackoverflow.com/a/42113965/3217870
 
 ```python
 def response_to_0_1(row):
-    if row['response'] == "PR":
+    if row['response'] in ["Q", "R"]:
         return(1)
-    elif row['response'] == "CR":
-        return(1)
-    else:
-        return(0)
+    elif row['response'] in ["S", "T"]:
+        return(0
+    elif row['response'] in ["X"]
+        return(np.NAN)
 
 outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
 ```
@@ -392,6 +392,33 @@ if coxnet_alpha is not None:
         return(res)
 
 ```
+
+
+# Plots
+
+### Grouped Kaplan Meier with at risk counts
+
+
+```python
+from lifelines import KaplanMeierFitter
+from lifelines.plotting import add_at_risk_counts
+
+
+def plot_grouped_km(data, groups, **kwargs):
+    ax = plt.gca()
+    kms = []
+    
+    for group, grouped_df in data.groupby(groups):
+        km = KaplanMeierFitter()
+        ax = km.fit(
+            grouped_df['time'],
+            event_observed=grouped_df['event'],
+            label=group).plot(ax=ax, **kwargs)
+        kms.append(km)
+    # https://lifelines.readthedocs.io/en/latest/Examples.html#displaying-at-risk-counts-below-plots
+    add_at_risk_counts(*kms, ax=ax, **kwargs)
+```
+
 
 
 # References/Inspirations

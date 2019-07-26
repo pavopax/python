@@ -1,5 +1,8 @@
 # Scalers and Outliers
 
+UPDATE: perhaps a better guide is [from `scikit-learn`
+docs](http://scikit-learn.org/stable/auto_examples/preprocessing/plot_all_scaling.html#sphx-glr-auto-examples-preprocessing-plot-all-scaling-py)
+
 Need 0.19 for `QuantileTransformer()`
 
 ```python
