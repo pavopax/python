@@ -9,7 +9,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegressionCV
 
 
-class Evalutor:
+class Evaluator:
 
     """Evaluate X, y, returning scores in self.scores_"""
 
@@ -106,6 +106,6 @@ if __name__ == '__main__':
     X, y = make_classification(n_samples=200, n_features=20, n_informative=15,
                                n_classes=2, weights=weights, random_state=1)
 
-    evaluator = Evalutor(n_jobs=n_jobs, add_pca=add_pca)
+    evaluator = Evaluator(n_jobs=n_jobs, add_pca=add_pca)
     evaluator.train_evaluate(X, y, return_summary=True)
     print(evaluator.scores_)
