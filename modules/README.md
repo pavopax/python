@@ -3,10 +3,10 @@
 
   * `robust_evaluate.py`
   
-	 **A quick way to robustly evalute signal in a classificaton task.**
+	 **A quick way to robustly evaluate signal in a classification task.**
 	 
      Given X, y, this script runs a Logistic Regression (balanced weights) and
-     evaluates it with nested, repeated cross-valdiation.
+     evaluates it with nested, repeated cross-validation.
 
 	 Useful for smaller data (less than hundreds of records) and potentially
      lots of features (use `--add_pca "yes"`), to quickly identify if there is
