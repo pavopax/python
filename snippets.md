@@ -87,6 +87,24 @@ Xt = vt.fit_transform(X)
 X.columns[vt.get_support()]
 ```
 
+Function to filter top K most variant columns:
+
+```python
+from sklearn.feature_selection import VarianceThreshold
+
+def top_variance_filter(df, k=100):
+    """Return df with top most variant columns"""
+    columns = df.columns.values
+    # get variances
+    vt = VarianceThreshold(0)
+    vt.fit(df)
+    variances = vt.variances_
+    # https://stackoverflow.com/a/6910672/3217870
+    index_top_variances = np.argpartition(variances, -k)[-k:]
+    df = df.iloc[:, index_top_variances]
+    return(df)
+```
+
 Best practice: apply a preprocessing pipeline separately from a modeling pipeline. 
 
 Rationale
@@ -234,6 +252,12 @@ def response_to_0_1(row):
         return(np.NAN)
 
 outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
+
+	
+# old:
+# outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
+# new:
+outcomes['resp_0_1'] = outcomes.apply(binarize_y, axis=1)
 ```
 
 
@@ -308,7 +332,7 @@ record = {
     'rows' : X.shape[0],
     'cols' : X.shape[1],
     'model': str(pipe.steps[-1]),
-    'full_pipe' : str(pipe.steps).replace("\n", "")
+    'full_pipe' : re.sub("\s+", " ", str(pipe.steps)))
 }
 
 
@@ -336,6 +360,8 @@ y.dead.astype('bool')
 ```
 
 ### Nulls
+
+tags: missing na count missing
 
 ```python
 df.isnull().sum().sum()
