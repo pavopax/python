@@ -240,7 +240,15 @@ is not true, try `df.reset_index()` and then filter on the column (instead of in
 
 ### filter using logical
 
-source: https://stackoverflow.com/a/42113965/3217870
+Source: https://stackoverflow.com/a/42113965/3217870
+
+_Update: can use list comprehension_
+
+```
+df['color'] = ['red' if x in['Y, 'Z'] else 'green' for x in df['color']]
+```
+
+Or, implement a function:
 
 ```python
 def response_to_0_1(row):
@@ -257,7 +265,7 @@ outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
 # old:
 # outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
 # new:
-outcomes['resp_0_1'] = outcomes.apply(binarize_y, axis=1)
+# outcomes['resp_0_1'] = outcomes.apply(binarize_y, axis=1)
 ```
 
 
