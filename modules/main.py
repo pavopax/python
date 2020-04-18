@@ -107,6 +107,20 @@ if __name__ == '__main__':
                         help="""Create imbalanced data?""")
     parser.add_argument('--holdout', action="store_true",
                         help="""Withold some data for a holdout evaluation?""")
+    parser.add_argument('--clf', default='lrcv', nargs="+", choices=['lrcv', 'gbm', 'hgbm'],
+                        help="""Classifier: any of lrcv, gbm, hgbm""")
+    parser.add_argument('--n_samples', default=100,
+                        help="""Number of samples in data (includes --holdout). Default is 300.""")
+    parser.add_argument('--n_features', default=20,
+                        help="""Number of features in data. Default is 20.""")
+    parser.add_argument('--n_informative', default=16,
+                        help="""Number of informative features in data. Default is 16.""")
+    parser.add_argument('--n_repeats', default=1,
+                        help="""Number of repeats for nested CV. Default is 1.""")
+    parser.add_argument('--add_pca', action="store_true",
+                        help="""Add PCA?""")
+    parser.add_argument('--n_jobs', default=2,
+                        help="""Number of cores to use. Default is 2.""")
     parser.add_argument('--random_state', default=99,
                         help="""Seed for sklearn""")
 
@@ -114,6 +128,13 @@ if __name__ == '__main__':
 
     imbalanced = args.imbalanced
     holdout = args.holdout
+    clf = args.clf              # TODO implement different kinds
+    n_samples = int(args.n_samples)
+    n_features = int(args.n_features)
+    n_informative = int(args.n_informative)
+    n_repeats = int(args.n_repeats)
+    add_pca = args.add_pca
+    n_jobs = int(args.n_jobs)
     random_state = int(args.random_state)
 
     print("Creating data...")
@@ -121,27 +142,47 @@ if __name__ == '__main__':
     if imbalanced:
         weights = [1.9,  0.8]
 
-    X_, y_ = make_classification(n_samples=200, n_features=20,
-                                 n_informative=16, n_classes=2,
+    X_, y_ = make_classification(n_samples=n_samples, n_features=20,
+                                 n_informative=18, n_classes=2,
                                  weights=weights, random_state=random_state)
 
     if holdout:
+        holdout_size = 0.2
         X, X_holdout, y, y_holdout = train_test_split(
-            X_, y_, test_size=0.2, random_state=random_state)
+            X_, y_, test_size=holdout_size, random_state=random_state)
     else:
         X = X_
         y = y_
 
-    est = make_pipeline(
-        StandardScaler(),
-        LogisticRegressionCV(cv=3, scoring="accuracy", n_jobs=1,
-                             class_weight=None, random_state=random_state,
-                             max_iter=300)
-    )
+    # TODO convert into arguments
+    n_components = 0.95
+    outer_cv = 5
+    inner_cv = 5
+    max_iter = 300
+    class_weight = None
+
+    inner_scoring = "roc_auc"
+
+    lrcv = LogisticRegressionCV(cv=inner_cv, scoring=inner_scoring,
+                                n_jobs=1,
+                                class_weight=class_weight,
+                                random_state=random_state, max_iter=max_iter)
+
+    if add_pca:
+        pipe = make_pipeline(
+            StandardScaler(),
+            PCA(n_components=n_components, random_state=random_state),
+            lrcv
+        )
+    else:
+        pipe = make_pipeline(
+            StandardScaler(),
+            lrcv
+        )
 
     print("Evaluating...")
-    ev = Evaluator(estimator=est, outer_cv=5, n_repeats=1,
-                   random_state=random_state)
+    ev = Evaluator(estimator=pipe, outer_cv=outer_cv, n_repeats=n_repeats,
+                   n_jobs=n_jobs, random_state=random_state)
     ev.train_evaluate(X, y, summarise_scores=True)
     print(pd.DataFrame(ev.scores_).T)
 
