@@ -11,16 +11,27 @@
 	Useful for smaller data (less than thousands of records) and potentially
 	lots of features, to quickly identify if there is a signal.
 
-    Usage:
+    **Usage**
 
-    Load the module into your environment to apply on your own data, or run on
-    command line with synthetic data:
 
-    `python robust_evaluate.py` 
+	```python
+	from robust_evaluate import Evaluator
+	
+    est = LogisticRegressionCV()
+	
+	ev = Evaluator(est, n_repeats=3, n_jobs=2)
+	ev.train_evaluate(X, y)
+	print(ev.scores_)
 
-	add `--help` for details
+	# if you have additional holdout data
+	ev.train_predict(X, y, X_holdout, y_holdout)
+	print(ev.holdout_scores_)
+	```
+
+    **Example with synthetic data**
+	
+	Usage: `python robust_evaluate.py` ,add `--help` for details
 	 
-	Example:
 
     ```bash
 	modules$ python robust_evaluate.py --imbalanced
