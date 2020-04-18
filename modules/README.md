@@ -3,28 +3,28 @@
 
   * `robust_evaluate.py`
   
-	 **A quick way to robustly evaluate signal in a classification task.**
+     **A quick way to robustly evaluate signal in a classification task.**
 	 
-     Given X, y, this script runs a Logistic Regression (balanced weights) and
-     evaluates it with nested, repeated cross-validation.
+     Given X, y, this script runs a Logistic Regression and evaluates it with
+     nested, repeated cross-validation.
 
-	 Useful for smaller data (less than hundreds of records) and potentially
-     lots of features (use `--add_pca "yes"`), to quickly identify if there is
-     a signal.
+	 Useful for smaller data (less than thousands of records) and potentially
+     lots of features, to quickly identify if there is a signal.
 
      Usage:
 
      Load the module into your environment to apply on your own data, or run on
      command line with synthetic data:
 
-     `python robust_evaluate.py` (add `--help` for more)
+     `python robust_evaluate.py` 
+
+	 add `--help` for more
 	 
 	 Example:
 
      ```
-	 modules$ python robust_evaluate.py --add_pca no --imbalanced yes
+	 modules$ python robust_evaluate.py --imbalanced 
 	 Creating data...
-	 Processing...
 	 Evaluating...
 	                          mean    std  n_scores
 	 test_average_precision  0.547  0.153       6.0
@@ -36,8 +36,4 @@
 	 test_f1_weighted        0.898  0.035       6.0
 	 test_neg_log_loss      -0.619  0.116       6.0
 	 ```
-	 
 
-
-
-     
