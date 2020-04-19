@@ -100,7 +100,11 @@ if __name__ == '__main__':
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
     from sklearn.model_selection import train_test_split
+
     from sklearn.linear_model import LogisticRegressionCV
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.experimental import enable_hist_gradient_boosting  # noqa
+    from sklearn.ensemble import HistGradientBoostingClassifier
 
     parser = argparse.ArgumentParser(description="Arguments")
     parser.add_argument('--imbalanced', action="store_true",
@@ -115,6 +119,8 @@ if __name__ == '__main__':
                         help="""Number of features in data. Default is 20.""")
     parser.add_argument('--n_informative', default=16,
                         help="""Number of informative features in data. Default is 16.""")
+    parser.add_argument('--outer_cv', default=5,
+                        help="""K for outer KFold CV nested CV. Default is 5.""")
     parser.add_argument('--n_repeats', default=1,
                         help="""Number of repeats for nested CV. Default is 1.""")
     parser.add_argument('--add_pca', action="store_true",
@@ -128,10 +134,11 @@ if __name__ == '__main__':
 
     imbalanced = args.imbalanced
     holdout = args.holdout
-    clf = args.clf              # TODO implement different kinds
+    clf = args.clf
     n_samples = int(args.n_samples)
     n_features = int(args.n_features)
     n_informative = int(args.n_informative)
+    outer_cv = int(args.outer_cv)
     n_repeats = int(args.n_repeats)
     add_pca = args.add_pca
     n_jobs = int(args.n_jobs)
@@ -156,37 +163,47 @@ if __name__ == '__main__':
 
     # TODO convert into arguments
     n_components = 0.95
-    outer_cv = 5
     inner_cv = 5
     max_iter = 300
     class_weight = None
 
-    inner_scoring = "roc_auc"
-
-    lrcv = LogisticRegressionCV(cv=inner_cv, scoring=inner_scoring,
+    lrcv = LogisticRegressionCV(cv=inner_cv, scoring="accuracy",
                                 n_jobs=1,
                                 class_weight=class_weight,
                                 random_state=random_state, max_iter=max_iter)
+    gbm = GradientBoostingClassifier(n_estimators=100)
+    hgbm = HistGradientBoostingClassifier(max_iter=100)
 
-    if add_pca:
-        pipe = make_pipeline(
-            StandardScaler(),
-            PCA(n_components=n_components, random_state=random_state),
-            lrcv
-        )
-    else:
-        pipe = make_pipeline(
-            StandardScaler(),
-            lrcv
-        )
+    print("Samples: ", str(n_samples))
+    print("Features: ", str(n_features))
+    print("Informative: ", str(n_informative))
 
-    print("Evaluating...")
-    ev = Evaluator(estimator=pipe, outer_cv=outer_cv, n_repeats=n_repeats,
-                   n_jobs=n_jobs, random_state=random_state)
-    ev.train_evaluate(X, y, summarise_scores=True)
-    print(pd.DataFrame(ev.scores_).T)
+    # convert single clf argument to list, if only one was passed
+    if type(clf) is not list:
+        clf = [clf]
 
-    if holdout:
-        print("\nChecking holdout...")
-        ev.train_predict(X, y, X_holdout, y_holdout)
-        print(pd.Series(ev.holdout_scores_))
+    for clf_ in clf:
+        print("Evaluating classifier: ", clf_)
+
+        if add_pca:
+            pipe = make_pipeline(
+                StandardScaler(),
+                PCA(n_components=n_components, random_state=random_state),
+                eval(clf_)
+            )
+        else:
+            pipe = make_pipeline(
+                StandardScaler(),
+                eval(clf_)
+            )
+
+        ev = Evaluator(estimator=pipe, outer_cv=outer_cv, n_repeats=n_repeats,
+                       n_jobs=n_jobs, random_state=random_state)
+        ev.train_evaluate(X, y, summarise_scores=True)
+        print(pd.DataFrame(ev.scores_).T)
+
+        if holdout:
+            print("\nChecking holdout...")
+            ev.train_predict(X, y, X_holdout, y_holdout)
+            print(pd.Series(ev.holdout_scores_))
+        print("\n")
