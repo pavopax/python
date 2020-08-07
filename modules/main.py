@@ -152,11 +152,11 @@ if __name__ == '__main__':
     if imbalanced:
         weights = [1.9,  0.8]
 
-    X_, y_ = make_classification(n_samples=n_samples, n_features=20,
-                                 n_informative=18, n_classes=2,
+    X_, y_ = make_classification(n_samples=n_samples, n_features=n_features,
+                                 n_informative=n_informative, n_classes=2,
                                  weights=weights, random_state=random_state)
 
-    if holdout:
+    if holdout | holdout_only:
         holdout_size = 0.2
         X, X_holdout, y, y_holdout = train_test_split(
             X_, y_, test_size=holdout_size, random_state=random_state)
@@ -207,7 +207,7 @@ if __name__ == '__main__':
         if not holdout_only:
             print(pd.DataFrame(ev.scores_).T)
 
-        if holdout:
+        if holdout | holdout_only:
             print("\nChecking holdout...")
             ev.train_predict(X, y, X_holdout, y_holdout)
             print(pd.Series(ev.holdout_scores_))
