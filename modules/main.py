@@ -111,6 +111,8 @@ if __name__ == '__main__':
                         help="""Create imbalanced data?""")
     parser.add_argument('--holdout', action="store_true",
                         help="""Withold some data for a holdout evaluation?""")
+    parser.add_argument('--holdout_only', action="store_true",
+                        help="""Only report holdout scores and do not show nested CV scores?""")
     parser.add_argument('--clf', default='lrcv', nargs="+", choices=['lrcv', 'gbm', 'hgbm'],
                         help="""Classifier: any of lrcv, gbm, hgbm""")
     parser.add_argument('--n_samples', default=100,
@@ -134,6 +136,7 @@ if __name__ == '__main__':
 
     imbalanced = args.imbalanced
     holdout = args.holdout
+    holdout_only = args.holdout_only
     clf = args.clf
     n_samples = int(args.n_samples)
     n_features = int(args.n_features)
@@ -200,7 +203,9 @@ if __name__ == '__main__':
         ev = Evaluator(estimator=pipe, outer_cv=outer_cv, n_repeats=n_repeats,
                        n_jobs=n_jobs, random_state=random_state)
         ev.train_evaluate(X, y, summarise_scores=True)
-        print(pd.DataFrame(ev.scores_).T)
+
+        if not holdout_only:
+            print(pd.DataFrame(ev.scores_).T)
 
         if holdout:
             print("\nChecking holdout...")
