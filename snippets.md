@@ -240,11 +240,9 @@ is not true, try `df.reset_index()` and then filter on the column (instead of in
 
 # Create New Columns
 
-## filter using logical
+Reference: https://stackoverflow.com/a/42113965/3217870
 
-Source: https://stackoverflow.com/a/42113965/3217870
-
-_Update: can use list comprehension_
+### With list comprehension
 
 ```python
 df['color'] = ['red' if x in['Y, 'Z'] else 'green' for x in df['color']]
@@ -258,7 +256,7 @@ df['response_binary'] = np.where(
 
 ```
 
-Or, implement a function:
+### With function:
 
 ```python
 def response_to_0_1(row):
