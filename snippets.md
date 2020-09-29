@@ -238,14 +238,24 @@ is not true, try `df.reset_index()` and then filter on the column (instead of in
 *If you ARE using a multilevel index, you would need to specify the level to filter on. For this, following rule one in `import this`, I had: `dfs[trt] =  X[X.index.get_level_values('trt').isin([trt])]`.*
 
 
-### filter using logical
+# Create New Columns
+
+## filter using logical
 
 Source: https://stackoverflow.com/a/42113965/3217870
 
 _Update: can use list comprehension_
 
-```
+```python
 df['color'] = ['red' if x in['Y, 'Z'] else 'green' for x in df['color']]
+
+# with missing
+df['response_binary'] = np.where(
+    df['response'].isnull(),
+    np.nan,
+    [1 if x == 'good' else 0 for x in df['response']]
+)
+
 ```
 
 Or, implement a function:
@@ -259,17 +269,12 @@ def response_to_0_1(row):
     elif row['response'] in ["X"]
         return(np.NAN)
 
+# assign copies the dataframe
 outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
-
 	
-# old:
-# outcomes = outcomes.assign(resp_0_1=outcomes.apply(response_to_0_1, axis=1))
-# new:
-# outcomes['resp_0_1'] = outcomes.apply(binarize_y, axis=1)
+# assign in place on the original dataframe (preferred)
+outcomes['resp_0_1'] = outcomes.apply(response_to_0_1, axis=1)
 ```
-
-
-
 
 
 
