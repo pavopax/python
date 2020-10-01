@@ -4,7 +4,7 @@ Mostly for machine learning and other modeling
 
 # Contents
 
-`cv.ipynb` - The right way to do cross validation
+`cv.ipynb` - The right way to do cross validation (condensed in `cv.py`)
 
 `scalers-outliers.md` - Scaling, by example
 
