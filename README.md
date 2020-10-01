@@ -4,6 +4,8 @@ Mostly for machine learning and other modeling
 
 # Contents
 
+`cv.ipynb` - The right way to do cross validation
+
 `scalers-outliers.md` - Scaling, by example
 
 `snippets.md` - Useful snippets
