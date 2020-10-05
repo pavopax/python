@@ -10,6 +10,8 @@ Mostly for machine learning and other modeling
 
 `snippets.md` - Useful snippets
 
+`xgboost.py` - XGBoost with cross-validation
+
 
 # References
 
